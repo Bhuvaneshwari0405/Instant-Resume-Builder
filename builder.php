@@ -42,7 +42,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -99,12 +103,14 @@
 
                         <button id="generateQRButton" type="button">Generate QR</button>
                         </div>
+                        <!-- Make sure this container is available for QR -->
+<div id="qrcode" style="display: none;"></div>
 
 
 
                     `;
             previewHTML = `
-                        <h2 id="preview-name">Your Name</h2>
+                        <h4 id="preview-name">Your Name</h4>
                         <p id="preview-email">Email</p>
                         <p id="preview-mobile">Mobile No</p>
                         <hr>
@@ -395,47 +401,82 @@
 
 
       document.addEventListener("DOMContentLoaded", function () {
-      const qrBtn = document.getElementById("generateQRButton");
+  const qrBtn = document.getElementById("generateQRButton");
 
-      qrBtn.addEventListener("click", async function () {
-        const resume = document.getElementById("resume-preview");
+  qrBtn.addEventListener("click", async function () {
+    const resume = document.getElementById("resume-preview");
 
-        // Convert HTML to PDF blob
-        const pdfBlob = await html2pdf().from(resume).outputPdf('blob');
+    if (!resume) {
+      alert("Resume preview not found.");
+      return;
+    }
 
-        // Upload PDF to server
-        const formData = new FormData();
-        formData.append("resumePdf", pdfBlob, "resume.pdf");
+    // Convert resume section to canvas
+    const canvas = await html2canvas(resume, { scale: 2 });
 
-        const response = await fetch("upload-pdf.php", {
-          method: "POST",
-          body: formData
+    // Convert canvas to image data
+    const imgData = canvas.toDataURL("image/png");
+
+    // Create PDF from the image
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+    // Convert to Blob
+    const pdfBlob = pdf.output("blob");
+
+    // Upload PDF to the server (PHP code for database insertion)
+    const formData = new FormData();
+    formData.append("resumePdf", pdfBlob, "resume.pdf");
+
+    const response = await fetch("upload-pdf.php", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.pdfUrl) {
+      // Make sure the container for QR code exists
+      const qrContainer = document.getElementById("qrcode");
+      if (qrContainer) {
+        qrContainer.innerHTML = ""; // Clear any previous QR
+        const qr = new QRCode(qrContainer, {
+          text: result.pdfUrl,
+          width: 297,
+          height:210
         });
 
-        const result = await response.json();
-
-        if (result.pdfUrl) {
-          // Generate QR with URL
-          QRCode.toDataURL(result.pdfUrl, function (err, url) {
-            if (err) {
-              console.error(err);
-              return;
-            }
-
-            // Create a download link
+        // Convert QR image to download link
+        setTimeout(() => {
+          const img = qrContainer.querySelector("img");
+          if (img) {
             const link = document.createElement("a");
-            link.href = url;
+            link.href = img.src;
             link.download = "resume-qr.png";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-          });
-        } else {
-          alert("PDF upload failed.");
-        }
-      });
-    });
-
+          } else {
+            alert("QR image not found.");
+          }
+        }, 500);
+      } else {
+        alert("QR container not found.");
+      }
+    } else {
+      alert("PDF upload failed.");
+      console.log(result);
+    }
+  });
+});
 function downloadResume() {
         window.scrollTo(0, 0); // Avoid spacing issues
 
