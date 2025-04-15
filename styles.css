@@ -1,0 +1,89 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar */
+.navbar-brand img {
+    margin-right: 10px;
+    border-radius: 100%;
+}
+
+/* Home Page */
+.quote {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.quote-subtext {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Template Selection */
+.template-card {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.template-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.template-card img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.template-card p {
+    margin: 0;
+    font-weight: bold;
+}
+
+/* Builder Page */
+#form-container {
+    min-height: 300px; /* Ensure form section is visible */
+}
+
+/* .resume-preview {
+    border: 1px solid #ddd;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    min-height: 400px;
+} */
+
+.resume-preview {
+    width: 794px;
+    min-height: 1123px;
+    background-color: white;
+    padding: 40px;
+    margin: 0 auto;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    color: #000;
+    line-height: 1.6;
+  }
+.resume-preview h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.resume-preview p, .resume-preview span {
+    color: #34495e;
+    margin: 5px 0;
+}
+
+.resume-preview strong {
+    color: #2c3e50;
+}
+
+  
