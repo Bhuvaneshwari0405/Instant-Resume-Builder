@@ -1,14 +1,6 @@
 <?php
 // Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "minor_project";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include 'db.php';
 
 // Check if the file is uploaded
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['resumePdf'])) {
