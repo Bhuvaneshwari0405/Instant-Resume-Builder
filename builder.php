@@ -211,9 +211,10 @@
 
     .resume-preview {
         background-color: #f8f9fa;
-        
         padding: 20px;
-       
+        max-width: 100%; /* Ensure it doesn't exceed the container width */
+        margin: 0 auto; /* Center the preview */
+        overflow-x: auto; /* Handle overflow for wider content */
     }
     </style>
 </head>
